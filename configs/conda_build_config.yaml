@@ -1,0 +1,7 @@
+VTK_WITH_OSMESA:
+    - False
+    - True
+
+CONDA_BUILD_SYSROOT:
+    - /opt/MacOSX10.9.sdk        # [osx]
+
