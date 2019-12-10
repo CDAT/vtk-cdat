@@ -1,0 +1,38 @@
+version: 2
+
+aliases:
+  - &setup_miniconda:
+    name: setup_miniconda
+    command: |
+       mkdir -p workspace
+       git clone -b validateNightly git@github.com:CDAT/cdat workspace/cdat
+       # install_miniconda.py installs miniconda3 under $WORKDIR/miniconda
+       python workspace/cdat/scripts/install_miniconda.py -w $WORKDIR -p 'py3'
+
+  - &build_vtk_cdat:
+    name: build_vtk_cdat:
+       # REVISIT
+       git clone -b sync_recipe https://github.com/CDAT/conda-recipes.git $WORKDIR/conda-recipes
+       source $WORKDIR/miniconda/etc/profile.d/conda.sh
+       conda activate base
+       python $WORKDIR/conda-recipes/conda_build_upload.py -w $WORKDIR -l $LAST_STABLE -B 0 -p vtk-cdat
+
+
+jobs:
+   macos_vtk_cdat:
+      macos:
+         xcode: "11.2.0"
+      resource_class: large
+      environment:
+         WORKDIR: "workdir"
+      steps:
+         - checkout
+         - run: *setup_miniconda
+         - run: *build_vtk_cdat
+
+workflows:
+   version: 2
+   vcs:
+      jobs:
+         - macos_vtk_cdat
+
