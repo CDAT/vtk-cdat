@@ -25,6 +25,7 @@ jobs:
       resource_class: large
       environment:
          WORKDIR: "workdir"
+         LAST_STABLE: "8.2.0.8.2"
       steps:
          - checkout
          - run: *setup_miniconda
