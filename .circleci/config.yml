@@ -24,7 +24,7 @@ jobs:
          xcode: "11.2.0"
       resource_class: large
       environment:
-         WORKDIR: "workdir"
+         WORKDIR: "/users/distiller/project/workdir"
          LAST_STABLE: "8.2.0.8.2"
       steps:
          - checkout
