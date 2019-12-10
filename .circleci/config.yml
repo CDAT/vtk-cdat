@@ -11,8 +11,8 @@ aliases:
 
   - &build_vtk_cdat
     name: build_vtk_cdat
-       # REVISIT
-       git clone -b sync_recipe https://github.com/CDAT/conda-recipes.git $WORKDIR/conda-recipes
+    command: |
+       git clone -b sync_recipe https://github.com/CDAT/conda-recipes.git $WORKDIR/conda-recipes 
        source $WORKDIR/miniconda/etc/profile.d/conda.sh
        conda activate base
        python $WORKDIR/conda-recipes/conda_build_upload.py -w $WORKDIR -l $LAST_STABLE -B 0 -p vtk-cdat
