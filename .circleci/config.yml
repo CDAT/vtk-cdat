@@ -10,7 +10,7 @@ aliases:
        python workspace/cdat/scripts/install_miniconda.py -w $WORKDIR -p 'py3'
 
   - &build_vtk_cdat:
-    name: build_vtk_cdat:
+    name: build_vtk_cdat
        # REVISIT
        git clone -b sync_recipe https://github.com/CDAT/conda-recipes.git $WORKDIR/conda-recipes
        source $WORKDIR/miniconda/etc/profile.d/conda.sh
