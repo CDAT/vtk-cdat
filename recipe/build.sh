@@ -19,9 +19,12 @@ elif [ "${OSNAME}" == Linux ]; then
 fi
 PYTHON_INCLUDE_PARAMETER_NAME="Python${PYTHON_MAJOR_VERSION}_INCLUDE_DIR"
 PYTHON_LIBRARY_PARAMETER_NAME="Python${PYTHON_MAJOR_VERSION}_LIBRARY_RELEASE"
-if [ "${OSNAME}" == Darwin ]; then
-    CONDA_BUILD_SYSROOT=/opt/MacOSX10.9.sdk
-fi
+
+echo "\n\nXXX XXX XXX CONDA_BUILD_SYSROOT: ${CONDA_BUILD_SYSROOT} XXX XXX XXX\n"
+
+#if [ "${OSNAME}" == Darwin ]; then
+#    CONDA_BUILD_SYSROOT=/opt/MacOSX10.9.sdk
+#fi
 
 if [ -f "$PREFIX/lib/libOSMesa32${SHLIB_EXT}" ]; then
     VTK_ARGS="${VTK_ARGS} \
