@@ -1,7 +1,7 @@
 version: 2
 
 aliases:
-  - &setup_miniconda:
+  - &setup_miniconda
     name: setup_miniconda
     command: |
        mkdir -p workspace
@@ -9,7 +9,7 @@ aliases:
        # install_miniconda.py installs miniconda3 under $WORKDIR/miniconda
        python workspace/cdat/scripts/install_miniconda.py -w $WORKDIR -p 'py3'
 
-  - &build_vtk_cdat:
+  - &build_vtk_cdat
     name: build_vtk_cdat
        # REVISIT
        git clone -b sync_recipe https://github.com/CDAT/conda-recipes.git $WORKDIR/conda-recipes
