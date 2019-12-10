@@ -14,6 +14,7 @@ source:
 
 build:
   number: {{ build_number }}
+  skip: True  # [win] 
   features:
     - mesalib  # [VTK_WITH_OSMESA]
 
