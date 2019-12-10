@@ -35,7 +35,7 @@ jobs:
          - image: circleci/python:latest
       resource_class: large
       environment:
-         WORKDIR: "/users/distiller/project/workdir"
+         WORKDIR: "/home/circleci/project/workdir"
          LAST_STABLE: "8.2.0.8.2"
       steps:
          - checkout
