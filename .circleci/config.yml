@@ -76,7 +76,7 @@ jobs:
 
    macos_vtk_cdat_py2:
       macos:
-         xcode: "11.1.0"
+         xcode: "11.2.0"
       environment:
          WORKDIR: /Users/distiller/project/macos_build
          PKG_NAME: "vtk-cdat"
@@ -89,14 +89,6 @@ jobs:
          - attach_workspace:
               at: .
          - run: *conda_build
-         - run: *setup_run_tests
-         - run: *run_tests
-         - store_artifacts:
-              path: tests_html
-              destination: tests_html
-         - store_artifacts:
-             path: tests_png
-             destination: tests_png
          - persist_to_workspace:
               root: .
               paths:
@@ -104,7 +96,7 @@ jobs:
 
    macos_vtk_cdat_py37:
       macos:
-         xcode: "11.1.0"
+         xcode: "11.2.0"
       environment:
          WORKDIR: /Users/distiller/project/macos_build
          PKG_NAME: "vtk-cdat"
@@ -117,14 +109,6 @@ jobs:
          - attach_workspace:
               at: .
          - run: *conda_build
-         - run: *setup_run_tests
-         - run: *run_tests
-         - store_artifacts:
-              path: tests_html
-              destination: tests_html
-         - store_artifacts:
-             path: tests_png
-             destination: tests_png
          - persist_to_workspace:
               root: .
               paths:
@@ -145,14 +129,6 @@ jobs:
          - attach_workspace:
               at: .
          - run: *conda_build
-         - run: *setup_run_tests
-         - run: *run_tests
-         - store_artifacts:
-              path: tests_html
-              destination: tests_html
-         - store_artifacts:
-             path: tests_png
-             destination: tests_png
          - persist_to_workspace:
               root: .
               paths:
@@ -173,14 +149,6 @@ jobs:
          - attach_workspace:
               at: .
          - run: *conda_build
-         - run: *setup_run_tests
-         - run: *run_tests
-         - store_artifacts:
-              path: tests_html
-              destination: tests_html
-         - store_artifacts:
-             path: tests_png
-             destination: tests_png
          - persist_to_workspace:
               root: .
               paths:
