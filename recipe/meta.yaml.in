@@ -1,5 +1,3 @@
-{% set build_number = @BUILD_NUMBER@ %}
-
 package:
   name: vtk-cdat
   version: @VERSION@
@@ -13,7 +11,7 @@ source:
   git_url: https://gitlab.kitware.com/vtk/vtk.git
 
 build:
-  number: {{ build_number }}
+  number: @BUILD_NUMBER@
   skip: True  # [win] 
   features:
     - mesalib  # [vtk_with_osmesa]
