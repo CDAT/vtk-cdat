@@ -42,27 +42,186 @@ aliases:
        anaconda $UPLOAD_OPTIONS $WORKDIR/miniconda/conda-bld/noarch/$PKG_NAME-$VERSION.`date +%Y*`0.tar.bz2 --force
 
 jobs:
-   macos_vtk_cdat:
+   macos_setup:
       macos:
          xcode: "11.2.0"
       environment:
-         WORKDIR: "/users/distiller/project/workdir"
+         WORKDIR: /Users/distiller/project/macos_build
          PKG_NAME: "vtk-cdat"
          LAST_STABLE: "8.2.0.8.2"
-         BUILD_VARIANT_VER: "noarch"
-         # for conda_upload
-         VERSION: "8.2.0.8.2"
-         USER: "cdat"
-         LABEL: "nightly"
       steps:
-         - checkout
          - run: *setup_miniconda
          - run: *conda_rerender
+         - persist_to_workspace:
+              root: .
+              paths: 
+                 - macos_build
+
+   linux_setup:
+      machine:
+         image: circleci/classic:latest
+      environment:
+         WORKDIR: /home/circleci/project/linux_build
+         PKG_NAME: "vtk-cdat"
+         LAST_STABLE: "8.2.0.8.2"
+      steps:
+         - attach_workspace:
+              at: .
+         - run: *setup_miniconda
+         - run: *conda_rerender
+         - persist_to_workspace:
+              root: .
+              paths:
+                 - linux_build
+
+   macos_vtk_cdat_py2:
+      macos:
+         xcode: "11.1.0"
+      environment:
+         WORKDIR: /Users/distiller/project/macos_build
+         PKG_NAME: "vtk-cdat"
+         ENV_NAME: "test_vtk_cdat"
+         LAST_STABLE: "8.2.0.8.2"
+         CONDA_PY_VER: "python<3"
+         BUILD_VARIANT_VER: "2.7"
+      steps:
+         - checkout
+         - attach_workspace:
+              at: .
          - run: *conda_build
+         - run: *setup_run_tests
+         - run: *run_tests
+         - store_artifacts:
+              path: tests_html
+              destination: tests_html
+         - store_artifacts:
+             path: tests_png
+             destination: tests_png
+         - persist_to_workspace:
+              root: .
+              paths:
+                 - macos_build/miniconda/conda-bld/osx-64/vtk-cdat*tar.bz2
+
+   macos_vtk_cdat_py37:
+      macos:
+         xcode: "11.1.0"
+      environment:
+         WORKDIR: /Users/distiller/project/macos_build
+         PKG_NAME: "vtk-cdat"
+         ENV_NAME: "test_vtk_cdat"
+         LAST_STABLE: "8.2.0.8.2"
+         CONDA_PY_VER: "python>=3.7,<3.8"
+         BUILD_VARIANT_VER: "3.7"
+      steps:
+         - checkout
+         - attach_workspace:
+              at: .
+         - run: *conda_build
+         - run: *setup_run_tests
+         - run: *run_tests
+         - store_artifacts:
+              path: tests_html
+              destination: tests_html
+         - store_artifacts:
+             path: tests_png
+             destination: tests_png
+         - persist_to_workspace:
+              root: .
+              paths:
+                 - macos_build/miniconda/conda-bld/osx-64/vtk-cdat*tar.bz2
+
+   linux_vtk_cdat_py2:
+      machine:
+         image: circleci/classic:latest
+      environment:
+         WORKDIR: /home/circleci/project/linux_build
+         PKG_NAME: "vtk-cdat"
+         ENV_NAME: "test_vtk_cdat"
+         LAST_STABLE: "8.2.0.8.2"
+         CONDA_PY_VER: "python<3"
+         BUILD_VARIANT_VER: "2.7"
+      steps:
+         - checkout
+         - attach_workspace:
+              at: .
+         - run: *conda_build
+         - run: *setup_run_tests
+         - run: *run_tests
+         - store_artifacts:
+              path: tests_html
+              destination: tests_html
+         - store_artifacts:
+             path: tests_png
+             destination: tests_png
+         - persist_to_workspace:
+              root: .
+              paths:
+                 - linux_build/miniconda/conda-bld/linux-64/vtk-cdat*tar.bz2
+
+   linux_vtk_cdat_py37:
+      machine:
+         image: circleci/classic:latest
+      environment:
+         WORKDIR: /home/circleci/project/linux_build
+         PKG_NAME: "vtk-cdat"
+         ENV_NAME: "test_vtk_cdat"
+         LAST_STABLE: "8.2.0.8.2"
+         CONDA_PY_VER: "python>=3.7,<3.8"
+         BUILD_VARIANT_VER: "3.7"
+      steps:
+         - checkout
+         - attach_workspace:
+              at: .
+         - run: *conda_build
+         - run: *setup_run_tests
+         - run: *run_tests
+         - store_artifacts:
+              path: tests_html
+              destination: tests_html
+         - store_artifacts:
+             path: tests_png
+             destination: tests_png
+         - persist_to_workspace:
+              root: .
+              paths:
+                 - linux_build/miniconda/conda-bld/linux-64/vtk-cdat*tar.bz2
+
+   upload:
+      machine:
+         image: circleci/classic:latest
+      environment:
+         WORKDIR: /home/circleci/project/linux_build
+         PKG_NAME: "vtk-cdat"
+         VERSION: "8.2.0.8.2"
+         USER: "cdat"
+         LABEL: "linatest"
+      steps:
+         - attach_workspace:
+              at: .
+         - run: pwd
          - run: *conda_upload
 
 workflows:
    version: 2
-   vcs:
+   cdtime:
       jobs:
-         - macos_vtk_cdat
+         - macos_setup
+         - linux_setup
+         - macos_vtk_cdat_py2:
+              requires:
+                 - macos_setup
+         - macos_vtk_cdat_py37:
+              requires:
+                 - macos_setup
+         - linux_vtk_cdat_py2:
+              requires:
+                 - linux_setup
+         - linux_vtk_cdat_py37:
+              requires:
+                 - linux_setup
+         - upload:
+              requires:
+                 - macos_vtk_cdat_py2
+                 - macos_vtk_cdat_py37
+                 - linux_vtk_cdat_py2
+                 - linux_vtk_cdat_py37
