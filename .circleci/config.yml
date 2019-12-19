@@ -23,6 +23,8 @@ aliases:
     command: |
        echo "cat $WORKDIR/vtk-cdat/recipe/meta.yaml"
        cat $WORKDIR/vtk-cdat/recipe/meta.yaml
+       echo "ls -l $WORKDIR/vtk-cdat/.ci_support"
+       ls -l $WORKDIR/vtk-cdat/.ci_support
        source $WORKDIR/miniconda/etc/profile.d/conda.sh
        conda activate base
        conda config --add channels conda-forge --force
