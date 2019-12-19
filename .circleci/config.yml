@@ -69,6 +69,10 @@ jobs:
               at: .
          - run: *setup_miniconda
          - run: *conda_rerender
+         - run: ls -l $WORKDIR
+         - run: ls -l $WORKDIR/vtk-cdat
+         - run: ls -l $WORKDIR/vtk-cdat/.ci_support
+         - run: ls -l $WORKDIR/vtk-cdat/recipe
          - persist_to_workspace:
               root: .
               paths:
