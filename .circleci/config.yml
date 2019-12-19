@@ -209,26 +209,6 @@ jobs:
               paths:
                  - macos_build/miniconda/conda-bld/osx-64/vtk-cdat*tar.bz2
 
-   macos_vtk_cdat_py37_mesaTrue:
-      macos:
-         xcode: "11.2.0"
-      environment:
-         WORKDIR: /Users/distiller/project/macos_build
-         PKG_NAME: "vtk-cdat"
-         ENV_NAME: "test_vtk_cdat"
-         LAST_STABLE: "8.2.0.8.2"
-         CONDA_PY_VER: "python>=3.7,<3.8"
-         BUILD_VARIANT_VER: "3.7vtk_with_osmesaTrue"
-      steps:
-         - checkout
-         - attach_workspace:
-              at: .
-         - run: *conda_build
-         - persist_to_workspace:
-              root: .
-              paths:
-                 - macos_build/miniconda/conda-bld/osx-64/vtk-cdat*tar.bz2
-
    linux_vtk_cdat_py2_mesaFalse:
       machine:
          image: circleci/classic:latest
