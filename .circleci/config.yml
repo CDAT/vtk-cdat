@@ -182,15 +182,15 @@ workflows:
 #         - macos_vtk_cdat_py2:
 #              requires:
 #                 - macos_setup
-#         - macos_vtk_cdat_py37:
-#              requires:
-#                 - macos_setup
+         - macos_vtk_cdat_py37:
+              requires:
+                 - macos_setup
 #         - linux_vtk_cdat_py2:
 #              requires:
 #                 - linux_setup
-#         - linux_vtk_cdat_py37:
-#              requires:
-#                 - linux_setup
+         - linux_vtk_cdat_py37:
+              requires:
+                 - linux_setup
 #         - upload:
 #              requires:
 #                 - macos_vtk_cdat_py2
