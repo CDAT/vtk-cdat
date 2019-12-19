@@ -43,6 +43,14 @@ aliases:
        UPLOAD_OPTIONS="-t $CONDA_UPLOAD_TOKEN upload -u $USER -l $LABEL"
        anaconda $UPLOAD_OPTIONS $WORKDIR/miniconda/conda-bld/noarch/$PKG_NAME-$VERSION.`date +%Y*`0.tar.bz2 --force
 
+  - &install_ninja
+    name: install_ninja
+    command: |
+       git clone git://github.com/ninja-build/ninja.git $WORKDIR/ninja
+       cd $WORKDIR/ninja
+       git checkout release
+       ./configure.py --bootstrap
+
 jobs:
    macos_setup:
       macos:
@@ -70,6 +78,7 @@ jobs:
          - attach_workspace:
               at: .
          - run: *setup_miniconda
+         - run: *install_ninja
          - run: *conda_rerender
          - run: ls -l $WORKDIR
          - run: ls -l $WORKDIR/vtk-cdat
