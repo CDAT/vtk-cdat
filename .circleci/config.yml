@@ -279,34 +279,34 @@ workflows:
          - macos_vtk_cdat_py2_mesaFalse:
               requires:
                  - macos_setup
-         - macos_vtk_cdat_py2_mesaTrue:
-              requires:
-                 - macos_setup
-         - macos_vtk_cdat_py37_mesaFalse:
-              requires:
-                 - macos_setup
-         - macos_vtk_cdat_py37_mesaTrue:
-              requires:
-                 - macos_setup
+         #- macos_vtk_cdat_py2_mesaTrue:
+         #     requires:
+         #        - macos_setup
+         #- macos_vtk_cdat_py37_mesaFalse:
+         #     requires:
+         #        - macos_setup
+         #- macos_vtk_cdat_py37_mesaTrue:
+         #     requires:
+         #        - macos_setup
          - linux_vtk_cdat_py2_mesaFalse:
               requires:
                  - linux_setup
-         - linux_vtk_cdat_py2_mesaTrue:
-              requires:
-                 - linux_setup
-         - linux_vtk_cdat_py37_mesaFalse:
-              requires:
-                 - linux_setup
-         - linux_vtk_cdat_py37_mesaTrue:
-              requires:
-                 - linux_setup
+         #- linux_vtk_cdat_py2_mesaTrue:
+         #     requires:
+         #        - linux_setup
+         #- linux_vtk_cdat_py37_mesaFalse:
+         #     requires:
+         #        - linux_setup
+         #- linux_vtk_cdat_py37_mesaTrue:
+         #     requires:
+         #        - linux_setup
          - upload:
               requires:
                  - macos_vtk_cdat_py2_mesaFalse
-                 - macos_vtk_cdat_py2_mesaTrue
-                 - macos_vtk_cdat_py37_mesaFalse
-                 - macos_vtk_cdat_py37_mesaTrue
+                 #- macos_vtk_cdat_py2_mesaTrue
+                 #- macos_vtk_cdat_py37_mesaFalse
+                 #- macos_vtk_cdat_py37_mesaTrue
                  - linux_vtk_cdat_py2_mesaFalse
-                 - linux_vtk_cdat_py2_mesaTrue
-                 - linux_vtk_cdat_py37_mesaFalse
-                 - linux_vtk_cdat_py37_mesaTrue
+                 #- linux_vtk_cdat_py2_mesaTrue
+                 #- linux_vtk_cdat_py37_mesaFalse
+                 #- linux_vtk_cdat_py37_mesaTrue
