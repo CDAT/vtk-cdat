@@ -264,6 +264,10 @@ jobs:
               at: .
          - run: pwd
          - run: ls -l
+         - run: ls -l macos_build
+         - run: ls -l macos_build/miniconda/conda-bld/osx-64
+         - run: ls -l linux_build
+         - run: ls -l linux_build/miniconda/conda-bld/linux-64
          - run: *conda_upload
 
 workflows:
