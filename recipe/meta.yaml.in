@@ -50,7 +50,7 @@ requirements:
     - {{ cdt("libselinux") }} # [linux and not vtk_with_osmesa]    
 
   host:
-    - python {{python}}
+    - python
     - numpy
     - ffmpeg
     # needed by ffmpeg for nice videos
@@ -59,7 +59,7 @@ requirements:
 
   run:
     - python
-    - numpy
+    - {{ pin_compatible('numpy') }}
     - future
     - ffmpeg
     # needed by ffmpeg for nice videos
