@@ -32,9 +32,9 @@ aliases:
   - &conda_upload
     name: conda_upload
     command: |
-       #if [[ $CIRCLE_BRANCH != "master" ]]; then
-       #   exit 0
-       #fi
+       if [[ $CIRCLE_BRANCH != "master" ]]; then
+          exit 0
+       fi
        source $WORKDIR/miniconda/etc/profile.d/conda.sh
        conda activate base
        UPLOAD_OPTIONS="-t $CONDA_UPLOAD_TOKEN upload -u $USER -l $LABEL"
@@ -251,7 +251,7 @@ jobs:
          PKG_NAME: "vtk-cdat"
          VERSION: "8.2.0.8.2"
          USER: "cdat"
-         LABEL: "linatest"
+         LABEL: "nightly"
       steps:
          - attach_workspace:
               at: .
