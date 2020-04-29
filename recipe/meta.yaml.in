@@ -54,10 +54,8 @@ requirements:
     # needed by ffmpeg for nice videos
     - x264
     #- mesalib=18.3.1  # [vtk_with_osmesa and linux]
-    #- mesalib=18.0.0  # [vtk_with_osmesa and osx]
-    - mesalib=18.3.1  # [vtk_with_osmesa and linux]
-    - mesalib=17.3.9  # [vtk_with_osmesa and osx]
-
+    #- mesalib=17.3.9  # [vtk_with_osmesa and osx]
+    - mesalib
   run:
     - python
     - {{ pin_compatible('numpy') }}
@@ -65,9 +63,9 @@ requirements:
     - ffmpeg
     # needed by ffmpeg for nice videos
     - x264
-    - mesalib=18.3.1 # [vtk_with_osmesa and linux]
-    - mesalib=18.0.0  # [vtk_with_osmesa and osx]
-
+    #- mesalib=18.3.1 # [vtk_with_osmesa and linux]
+    #- mesalib=18.0.0  # [vtk_with_osmesa and osx]
+    - mesalib
 test:
     imports:
         - vtk
