@@ -56,7 +56,9 @@ requirements:
     #- mesalib=18.3.1  # [vtk_with_osmesa and linux]
     #- mesalib=17.3.9  # [vtk_with_osmesa and osx]
     - mesalib
+    - hdf5
     - hdf5 * nompi_*
+    - libnetcdf
     - libnetcdf * nompi_*
   run:
     - python
@@ -67,6 +69,8 @@ requirements:
     - x264
     #- mesalib=18.3.1 # [vtk_with_osmesa and linux]
     #- mesalib=18.0.0  # [vtk_with_osmesa and osx]
+    - hdf5
+    - libnetcdf
     - mesalib
 test:
     imports:
