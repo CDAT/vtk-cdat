@@ -49,29 +49,55 @@ requirements:
 
   host:
     - python
+    # VTK Third Party dependencies
+    - zlib
+    - freetype
+    - hdf5
+    - hdf5 * nompi_*
+    - libxml2
+    - libpng
+    - jpeg
+    - libtiff
+    - jsoncpp
+    - expat
+    - tbb
+    - tbb-devel
+    - libnetcdf
+    - libnetcdf * nompi_*
+    - lz4-c
+    - xorg-libxt  # [linux]
+    - boost-cpp
+    - tk
     - numpy
     - ffmpeg
     # needed by ffmpeg for nice videos
     - x264
-    #- mesalib=18.3.1  # [vtk_with_osmesa and linux]
-    #- mesalib=17.3.9  # [vtk_with_osmesa and osx]
-    - mesalib
-    - hdf5
-    - hdf5 * nompi_*
-    - libnetcdf
-    - libnetcdf * nompi_*
+    - mesalib  # [vtk_with_osmesa]
+
   run:
     - python
+    - future  # used in the generated python wrappers
+    # VTK Third Party dependencies
+    - zlib
+    - freetype
+    - hdf5
+    - libxml2
+    - libpng
+    - jpeg
+    - libtiff
+    - jsoncpp
+    - expat
+    - tbb
+    - libnetcdf
+    - lz4-c
+    - xorg-libxt  # [linux]
+    - tk
     - {{ pin_compatible('numpy') }}
-    - future
     - ffmpeg
     # needed by ffmpeg for nice videos
     - x264
-    #- mesalib=18.3.1 # [vtk_with_osmesa and linux]
-    #- mesalib=18.0.0  # [vtk_with_osmesa and osx]
-    - hdf5
-    - libnetcdf
-    - mesalib
+    - mesalib # [vtk_with_osmesa]
+
 test:
     imports:
         - vtk
