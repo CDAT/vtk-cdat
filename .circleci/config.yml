@@ -111,6 +111,7 @@ jobs:
               root: .
               paths:
                  - artifacts
+                 - workdir
 
    upload:
       machine:
