@@ -27,7 +27,7 @@ aliases:
        else
           export PROJECT_DIR=/home/circleci/project/workdir/linux
        fi
-       echo "export WORKDIR=$PROJECT_DIR/$PY_VER" >> $BASH_ENV
+       echo "export WORKDIR=$PROJECT_DIR/${PY_VER}-${MESA_OR_NO_MESA}" >> $BASH_ENV
        cat $BASH_ENV
        source $BASH_ENV
        mkdir -p $WORKDIR
@@ -56,7 +56,7 @@ aliases:
        source $WORKDIR/miniconda/etc/profile.d/conda.sh
        conda activate base
        os=`uname`
-       artifacts_dir="artifacts/artifacts.${os}.py_${PY_VER}"
+       artifacts_dir="artifacts/artifacts.${os}.py_${PY_VER}.${MESA_OR_NO_MESA}"
        BUILD_VARIANT_VER="${PY_VER}.____cpythonvtk_with_os${MESA_OR_NO_MESA}"
        make conda-build conda=$WORKDIR/miniconda/bin/conda workdir=$WORKDIR artifact_dir=$PWD/$artifacts_dir build_version=$BUILD_VARIANT_VER
 
@@ -105,6 +105,7 @@ jobs:
          - checkout
          - run: *setup_env
          - run: *setup_miniconda
+         - run: *install_ninja
          - run: *conda_rerender
          - run: *conda_build
          - persist_to_workspace:
