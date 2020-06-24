@@ -135,8 +135,8 @@ workflows:
                  parameters:
                     os: [ linux, macos ]
                     py_ver: [ "3.6", "3.7", "3.8"]
-                    mesa_or_nomesa: [ "mesaFalse", "mesaTrue" ]
-              name: test-<< matrix.os >>-<< matrix.py_ver >>-<< matrix.mesa_or_nomesa >>
+                    mesa_or_no_mesa: [ "mesaFalse", "mesaTrue" ]
+              name: test-<< matrix.os >>-<< matrix.py_ver >>-<< matrix.mesa_or_no_mesa >>
          - upload:
               requires:
                  - build
