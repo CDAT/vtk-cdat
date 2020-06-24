@@ -1,45 +1,73 @@
-version: 2
+version: 2.1
+
+parameters:
+   pkg_name:
+      type: string
+      default: "vtk-cdat"
+   repo_name:
+      type: string
+      default: "vtk-cdat"
+   last_stable:
+      type: string
+      default: "8.2.0.8.2"
+   user:
+      type: string
+      default: "cdat"
+   label:
+      type: string
+      default: "nightly"
 
 aliases:
+  - &setup_env
+    name: setup_env
+    command: |
+       export OS_TYPE=`uname`
+       if [[ $OS_TYPE == "Darwin" ]]; then
+          export PROJECT_DIR=/Users/distiller/project/workdir/macos
+       else
+          export PROJECT_DIR=/home/circleci/project/workdir/linux
+       fi
+       echo "export WORKDIR=$PROJECT_DIR/$PY_VER" >> $BASH_ENV
+       cat $BASH_ENV
+       source $BASH_ENV
+       mkdir -p $WORKDIR
+
   - &setup_miniconda
     name: setup_miniconda
     command: |
-       mkdir -p workspace
-       git clone -b validateNightlyNew git@github.com:CDAT/cdat workspace/cdat
+       source $BASH_ENV
+       mkdir -p $WORKDIR
+       git clone -b validateNightlyNew https://github.com/CDAT/cdat.git $WORKDIR/cdat
        # install_miniconda.py installs miniconda3 under $WORKDIR/miniconda
-       python workspace/cdat/scripts/install_miniconda.py -w $WORKDIR -p 'py3'
+       python $WORKDIR/cdat/scripts/install_miniconda.py -w $WORKDIR -p 'py3'
 
   - &conda_rerender
     name: conda_rerender
     command: |
-       git clone https://github.com/CDAT/conda-recipes.git $WORKDIR/conda-recipes 
+       source $BASH_ENV
        source $WORKDIR/miniconda/etc/profile.d/conda.sh
        conda activate base
-       BUILD_SCRIPT="$WORKDIR/conda-recipes/build_tools/conda_build.py"
-       python $BUILD_SCRIPT -w $WORKDIR -l $LAST_STABLE -B 0 -p $PKG_NAME -b $CIRCLE_BRANCH --do_rerender
+       make conda-rerender conda=$WORKDIR/miniconda/bin/conda workdir=$WORKDIR last_stable=$LAST_STABLE branch=$CIRCLE_BRANCH
 
   - &conda_build
     name: conda_build
     command: |
+       source $BASH_ENV
        source $WORKDIR/miniconda/etc/profile.d/conda.sh
        conda activate base
-       conda config --add channels conda-forge --force
-       conda config --add channels cdat/label/nightly --force
-       conda config --set channel_priority strict
-       BUILD_SCRIPT="$WORKDIR/conda-recipes/build_tools/conda_build.py"
-       python $BUILD_SCRIPT -w $WORKDIR -p $PKG_NAME --build_version $BUILD_VARIANT_VER --do_build
+       os=`uname`
+       artifacts_dir="artifacts/artifacts.${os}.py_${PY_VER}"
+       BUILD_VARIANT_VER="${PY_VER}.____cpythonvtk_with_os${MESA_OR_NO_MESA}"
+       make conda-build conda=$WORKDIR/miniconda/bin/conda workdir=$WORKDIR artifact_dir=$PWD/$artifacts_dir build_version=$BUILD_VARIANT_VER
 
   - &conda_upload
     name: conda_upload
     command: |
-       #if [[ $CIRCLE_BRANCH != "master" ]]; then
-       #   exit 0
-       #fi
+       source $BASH_ENV
        source $WORKDIR/miniconda/etc/profile.d/conda.sh
        conda activate base
-       UPLOAD_OPTIONS="-t $CONDA_UPLOAD_TOKEN upload -u $USER -l $LABEL"
-       anaconda $UPLOAD_OPTIONS linux_build/miniconda/conda-bld/linux-64/$PKG_NAME-$VERSION.`date +%Y*`0.tar.bz2 --force
-       anaconda $UPLOAD_OPTIONS macos_build/miniconda/conda-bld/osx-64/$PKG_NAME-$VERSION.`date +%Y*`0.tar.bz2 --force
+       UPLOAD_OPTIONS="conda_upload_token=$CONDA_UPLOAD_TOKEN user=$USER label=$LABEL"
+       make conda-upload $UPLOAD_OPTIONS conda=$WORKDIR/miniconda/bin/conda artifact_dir="$PWD/artifacts/*/"
 
   - &install_ninja
     name: install_ninja
@@ -50,350 +78,58 @@ aliases:
        ./configure.py --bootstrap
 
 jobs:
-   macos_setup:
-      macos:
-         xcode: "11.4.0"
+   build:
+      parameters:
+         os:
+            type: executor
+         py_ver: 
+            type: string
+         mesa_or_no_mesa:
+            type: string
+      executor: << parameters.os >>
       environment:
-         WORKDIR: /Users/distiller/project/macos_build
-         PKG_NAME: "vtk-cdat"
-         LAST_STABLE: "8.2.0.8.2"
+         PKG_NAME: << pipeline.parameters.pkg_name >>
+         REPO_NAME: << pipeline.parameters.repo_name >>
+         LAST_STABLE: << pipeline.parameters.last_stable >>
+         PY_VER: << parameters.py_ver >>
+         MESA_OR_NO_MESA: << parameters.mesa_or_no_mesa >>
       steps:
+         - checkout
+         - run: *setup_env
          - run: *setup_miniconda
          - run: *conda_rerender
-         - persist_to_workspace:
-              root: .
-              paths: 
-                 - macos_build
-
-   linux_setup:
-      machine:
-         image: circleci/classic:latest
-      environment:
-         WORKDIR: /home/circleci/project/linux_build
-         PKG_NAME: "vtk-cdat"
-         LAST_STABLE: "8.2.0.8.2"
-      steps:
-         - attach_workspace:
-              at: .
-         - run: *setup_miniconda
-         - run: *install_ninja
-         - run: *conda_rerender
-         - persist_to_workspace:
-              root: .
-              paths:
-                 - linux_build
-
-   macos_vtk_cdat_py36_mesaFalse:
-      macos:
-         xcode: "11.4.0"
-      environment:
-         WORKDIR: /Users/distiller/project/macos_build
-         PKG_NAME: "vtk-cdat"
-         ENV_NAME: "test_vtk_cdat"
-         LAST_STABLE: "8.2.0.8.2"
-         CONDA_PY_VER: "python>=3.6,<3.7"
-         BUILD_VARIANT_VER: "3.6.____cpythonvtk_with_osmesaFalse"
-      steps:
-         - checkout
-         - attach_workspace:
-              at: .
          - run: *conda_build
          - persist_to_workspace:
               root: .
               paths:
-                 - macos_build/miniconda/conda-bld/osx-64/vtk-cdat*tar.bz2
-
-   macos_vtk_cdat_py36_mesaTrue:
-      macos:
-         xcode: "11.4.0"
-      environment:
-         WORKDIR: /Users/distiller/project/macos_build
-         PKG_NAME: "vtk-cdat"
-         ENV_NAME: "test_vtk_cdat"
-         LAST_STABLE: "8.2.0.8.2"
-         CONDA_PY_VER: "python>=3.6,<3.7"
-         BUILD_VARIANT_VER: "3.6.____cpythonvtk_with_osmesaTrue"
-      steps:
-         - checkout
-         - attach_workspace:
-              at: .
-         - run: *conda_build
-         - persist_to_workspace:
-              root: .
-              paths:
-                 - macos_build/miniconda/conda-bld/osx-64/vtk-cdat*tar.bz2
-
-   macos_vtk_cdat_py37_mesaFalse:
-      macos:
-         xcode: "11.4.0"
-      environment:
-         WORKDIR: /Users/distiller/project/macos_build
-         PKG_NAME: "vtk-cdat"
-         ENV_NAME: "test_vtk_cdat"
-         LAST_STABLE: "8.2.0.8.2"
-         CONDA_PY_VER: "python>=3.7,<3.8"
-         BUILD_VARIANT_VER: "3.7.____cpythonvtk_with_osmesaFalse"
-      steps:
-         - checkout
-         - attach_workspace:
-              at: .
-         - run: *conda_build
-         - persist_to_workspace:
-              root: .
-              paths:
-                 - macos_build/miniconda/conda-bld/osx-64/vtk-cdat*tar.bz2
-
-   macos_vtk_cdat_py37_mesaTrue:
-      macos:
-         xcode: "11.4.0"
-      environment:
-         WORKDIR: /Users/distiller/project/macos_build
-         PKG_NAME: "vtk-cdat"
-         ENV_NAME: "test_vtk_cdat"
-         LAST_STABLE: "8.2.0.8.2"
-         CONDA_PY_VER: "python>=3.7,<3.8"
-         BUILD_VARIANT_VER: "3.7.____cpythonvtk_with_osmesaTrue"
-      steps:
-         - checkout
-         - attach_workspace:
-              at: .
-         - run: *conda_build
-         - persist_to_workspace:
-              root: .
-              paths:
-                 - macos_build/miniconda/conda-bld/osx-64/vtk-cdat*tar.bz2
-
-   macos_vtk_cdat_py38_mesaFalse:
-      macos:
-         xcode: "11.4.0"
-      environment:
-         WORKDIR: /Users/distiller/project/macos_build
-         PKG_NAME: "vtk-cdat"
-         ENV_NAME: "test_vtk_cdat"
-         LAST_STABLE: "8.2.0.8.2"
-         CONDA_PY_VER: "python>=3.8,<3.9"
-         BUILD_VARIANT_VER: "3.8.____cpythonvtk_with_osmesaFalse"
-      steps:
-         - checkout
-         - attach_workspace:
-              at: .
-         - run: *conda_build
-         - persist_to_workspace:
-              root: .
-              paths:
-                 - macos_build/miniconda/conda-bld/osx-64/vtk-cdat*tar.bz2
-
-   macos_vtk_cdat_py38_mesaTrue:
-      macos:
-         xcode: "11.4.0"
-      environment:
-         WORKDIR: /Users/distiller/project/macos_build
-         PKG_NAME: "vtk-cdat"
-         ENV_NAME: "test_vtk_cdat"
-         LAST_STABLE: "8.2.0.8.2"
-         CONDA_PY_VER: "python>=3.8,<3.9"
-         BUILD_VARIANT_VER: "3.8.____cpythonvtk_with_osmesaTrue"
-      steps:
-         - checkout
-         - attach_workspace:
-              at: .
-         - run: *conda_build
-         - persist_to_workspace:
-              root: .
-              paths:
-                 - macos_build/miniconda/conda-bld/osx-64/vtk-cdat*tar.bz2
-
-   linux_vtk_cdat_py36_mesaFalse:
-      machine:
-         image: circleci/classic:latest
-      environment:
-         WORKDIR: /home/circleci/project/linux_build
-         PKG_NAME: "vtk-cdat"
-         ENV_NAME: "test_vtk_cdat"
-         LAST_STABLE: "8.2.0.8.2"
-         CONDA_PY_VER: "python>=3.6,<3.7"
-         BUILD_VARIANT_VER: "3.6.____cpythonvtk_with_osmesaFalse"
-      steps:
-         - checkout
-         - attach_workspace:
-              at: .
-         - run: *conda_build
-         - persist_to_workspace:
-              root: .
-              paths:
-                 - linux_build/miniconda/conda-bld/linux-64/vtk-cdat*tar.bz2
-
-   linux_vtk_cdat_py36_mesaTrue:
-      machine:
-         image: circleci/classic:latest
-      environment:
-         WORKDIR: /home/circleci/project/linux_build
-         PKG_NAME: "vtk-cdat"
-         ENV_NAME: "test_vtk_cdat"
-         LAST_STABLE: "8.2.0.8.2"
-         CONDA_PY_VER: "python>=3.6,<3.7"
-         BUILD_VARIANT_VER: "3.6.____cpythonvtk_with_osmesaTrue"
-      steps:
-         - checkout
-         - attach_workspace:
-              at: .
-         - run: *conda_build
-         - persist_to_workspace:
-              root: .
-              paths:
-                 - linux_build/miniconda/conda-bld/linux-64/vtk-cdat*tar.bz2
-
-   linux_vtk_cdat_py37_mesaFalse:
-      machine:
-         image: circleci/classic:latest
-      environment:
-         WORKDIR: /home/circleci/project/linux_build
-         PKG_NAME: "vtk-cdat"
-         ENV_NAME: "test_vtk_cdat"
-         LAST_STABLE: "8.2.0.8.2"
-         CONDA_PY_VER: "python>=3.7,<3.8"
-         BUILD_VARIANT_VER: "3.7.____cpythonvtk_with_osmesaFalse"
-      steps:
-         - checkout
-         - attach_workspace:
-              at: .
-         - run: *conda_build
-         - persist_to_workspace:
-              root: .
-              paths:
-                 - linux_build/miniconda/conda-bld/linux-64/vtk-cdat*tar.bz2
-
-   linux_vtk_cdat_py37_mesaTrue:
-      machine:
-         image: circleci/classic:latest
-      environment:
-         WORKDIR: /home/circleci/project/linux_build
-         PKG_NAME: "vtk-cdat"
-         ENV_NAME: "test_vtk_cdat"
-         LAST_STABLE: "8.2.0.8.2"
-         CONDA_PY_VER: "python>=3.7,<3.8"
-         BUILD_VARIANT_VER: "3.7.____cpythonvtk_with_osmesaTrue"
-      steps:
-         - checkout
-         - attach_workspace:
-              at: .
-         - run: *conda_build
-         - persist_to_workspace:
-              root: .
-              paths:
-                 - linux_build/miniconda/conda-bld/linux-64/vtk-cdat*tar.bz2
-
-   linux_vtk_cdat_py38_mesaFalse:
-      machine:
-         image: circleci/classic:latest
-      environment:
-         WORKDIR: /home/circleci/project/linux_build
-         PKG_NAME: "vtk-cdat"
-         ENV_NAME: "test_vtk_cdat"
-         LAST_STABLE: "8.2.0.8.2"
-         CONDA_PY_VER: "python>=3.8,<3.9"
-         BUILD_VARIANT_VER: "3.8.____cpythonvtk_with_osmesaFalse"
-      steps:
-         - checkout
-         - attach_workspace:
-              at: .
-         - run: *conda_build
-         - persist_to_workspace:
-              root: .
-              paths:
-                 - linux_build/miniconda/conda-bld/linux-64/vtk-cdat*tar.bz2
-
-   linux_vtk_cdat_py38_mesaTrue:
-      machine:
-         image: circleci/classic:latest
-      environment:
-         WORKDIR: /home/circleci/project/linux_build
-         PKG_NAME: "vtk-cdat"
-         ENV_NAME: "test_vtk_cdat"
-         LAST_STABLE: "8.2.0.8.2"
-         CONDA_PY_VER: "python>=3.8,<3.9"
-         BUILD_VARIANT_VER: "3.8.____cpythonvtk_with_osmesaTrue"
-      steps:
-         - checkout
-         - attach_workspace:
-              at: .
-         - run: *conda_build
-         - persist_to_workspace:
-              root: .
-              paths:
-                 - linux_build/miniconda/conda-bld/linux-64/vtk-cdat*tar.bz2
+                 - artifacts
 
    upload:
       machine:
          image: circleci/classic:latest
       environment:
-         WORKDIR: /home/circleci/project/linux_build
-         PKG_NAME: "vtk-cdat"
-         VERSION: "8.2.0.8.2"
-         USER: "cdat"
-         LABEL: "nightly"
+         PKG_NAME: << pipeline.parameters.pkg_name >>
+         VERSION: << pipeline.parameters.last_stable >>
+         USER: << pipeline.parameters.user >>
+         LABEL: << pipeline.parameters.label >>
       steps:
+         - checkout
          - attach_workspace:
               at: .
-         - run: pwd
-         - run: ls -l
-         - run: ls -l macos_build/miniconda/conda-bld/osx-64
-         - run: ls -l linux_build/miniconda/conda-bld/linux-64
+         - run: *setup_env
          - run: *conda_upload
 
 workflows:
-   version: 2
    vtk-cdat:
       jobs:
-         - macos_setup
-         - linux_setup
-         - macos_vtk_cdat_py36_mesaFalse:
-              requires:
-                 - macos_setup
-         - macos_vtk_cdat_py36_mesaTrue:
-              requires:
-                 - macos_setup
-         - macos_vtk_cdat_py37_mesaFalse:
-              requires:
-                 - macos_setup
-         - macos_vtk_cdat_py37_mesaTrue:
-              requires:
-                 - macos_setup
-         - macos_vtk_cdat_py38_mesaFalse:
-              requires:
-                 - macos_setup
-         - macos_vtk_cdat_py38_mesaTrue:
-              requires:
-                 - macos_setup
-         - linux_vtk_cdat_py36_mesaFalse:
-              requires:
-                 - linux_setup
-         - linux_vtk_cdat_py36_mesaTrue:
-              requires:
-                 - linux_setup
-         - linux_vtk_cdat_py37_mesaFalse:
-              requires:
-                 - linux_setup
-         - linux_vtk_cdat_py37_mesaTrue:
-              requires:
-                 - linux_setup
-         - linux_vtk_cdat_py38_mesaFalse:
-              requires:
-                 - linux_setup
-         - linux_vtk_cdat_py38_mesaTrue:
-              requires:
-                 - linux_setup
+         - build:
+              matrix:
+                 parameters:
+                    os: [ linux, macos ]
+                    py_ver: [ "3.6", "3.7", "3.8"]
+                    mesa_or_nomesa: [ "mesaFalse", "mesaTrue" ]
+              name: test-<< matrix.os >>-<< matrix.py_ver >>-<< matrix.mesa_or_nomesa >>
          - upload:
               requires:
-                 - macos_vtk_cdat_py36_mesaFalse
-                 - macos_vtk_cdat_py36_mesaTrue
-                 - macos_vtk_cdat_py37_mesaFalse
-                 - macos_vtk_cdat_py37_mesaTrue
-                 - macos_vtk_cdat_py38_mesaFalse
-                 - macos_vtk_cdat_py38_mesaTrue
-                 - linux_vtk_cdat_py36_mesaFalse
-                 - linux_vtk_cdat_py36_mesaTrue
-                 - linux_vtk_cdat_py37_mesaFalse
-                 - linux_vtk_cdat_py37_mesaTrue
-                 - linux_vtk_cdat_py38_mesaFalse
-                 - linux_vtk_cdat_py38_mesaTrue
+                 - build
+
