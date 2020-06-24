@@ -77,6 +77,14 @@ aliases:
        git checkout release
        ./configure.py --bootstrap
 
+executors:
+   linux:
+      machine:
+         image: circleci/classic:latest
+   macos:
+      macos:
+         xcode: "11.4.0"
+
 jobs:
    build:
       parameters:
