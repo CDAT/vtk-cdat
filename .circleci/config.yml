@@ -101,6 +101,9 @@ jobs:
          LAST_STABLE: << pipeline.parameters.last_stable >>
          PY_VER: << parameters.py_ver >>
          MESA_OR_NO_MESA: << parameters.mesa_or_no_mesa >>
+         VERSION: << pipeline.parameters.last_stable >>
+         USER: << pipeline.parameters.user >>
+         LABEL: << pipeline.parameters.label >>
       steps:
          - checkout
          - run: *setup_env
@@ -108,11 +111,12 @@ jobs:
          - run: *install_ninja
          - run: *conda_rerender
          - run: *conda_build
-         - persist_to_workspace:
-              root: .
-              paths:
-                 - artifacts
-                 - workdir
+         - run: *conda_upload
+#         - persist_to_workspace:
+#              root: .
+#              paths:
+#                 - artifacts
+#                 - workdir
 
    upload:
       machine:
@@ -139,7 +143,5 @@ workflows:
                     py_ver: [ "3.6", "3.7", "3.8"]
                     mesa_or_no_mesa: [ "mesaFalse", "mesaTrue" ]
               name: test-<< matrix.os >>-<< matrix.py_ver >>-<< matrix.mesa_or_no_mesa >>
-         - upload:
-              requires:
-                 - build
+
 
