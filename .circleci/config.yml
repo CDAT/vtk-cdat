@@ -140,7 +140,8 @@ workflows:
               matrix:
                  parameters:
                     os: [ linux, macos ]
-                    py_ver: [ "3.6", "3.7" ]
+                    #py_ver: [ "3.6", "3.7" ]
+                    py_ver: [ "3.8" ]
                     mesa_or_no_mesa: [ "mesaFalse", "mesaTrue" ]
               name: test-<< matrix.os >>-<< matrix.py_ver >>-<< matrix.mesa_or_no_mesa >>
 
