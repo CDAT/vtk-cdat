@@ -77,26 +77,6 @@ aliases:
        git checkout release
        ./configure.py --bootstrap
 
-  - &setup_run_tests
-    name: setup_run_tests
-    command: |
-       source $BASH_ENV
-       source $WORKDIR/miniconda/etc/profile.d/conda.sh
-       conda activate base
-       export CONDA_PY_VER="python=$PY_VER"
-       make setup-tests conda=$WORKDIR/miniconda/bin/conda conda_env=$ENV_NAME extra_pkgs="$CONDA_PY_VER $LIBNETCDF_VER $COVERAGE_PKGS"
-       make conda-dump-env conda=$WORKDIR/miniconda/bin/conda conda_env=$ENV_NAME artifact_dir=$PWD/spec_artifacts conda_env_filename=$CIRCLE_JOB
-
-  - &run_tests
-    name: run_tests
-    command: |
-       source $BASH_ENV
-       source $WORKDIR/miniconda/etc/profile.d/conda.sh
-       conda activate $ENV_NAME
-       make run-tests conda=$WORKDIR/miniconda/bin/conda conda_env=$ENV_NAME
-       conda deactivate
-       conda env remove -n $ENV_NAME
-
 executors:
    linux:
       machine:
@@ -131,9 +111,6 @@ jobs:
          - run: *install_ninja
          - run: *conda_rerender
          - run: *conda_build
-         - run: export LIBNETCDF_VER="libnetcdf=*=nompi_*" && *setup_run_tests && *run_tests 
-         - run: export LIBNETCDF_VER="libnetcdf=*=mpi_openmpi_*" && *setup_run_tests && *run_tests
-         - run: export LIBNETCDF_VER="libnetcdf=*=mpi_mpich_*" && *setup_run_tests && *run_tests
          - run: *conda_upload
 #         - persist_to_workspace:
 #              root: .
