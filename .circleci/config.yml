@@ -124,8 +124,6 @@ jobs:
          VERSION: << pipeline.parameters.last_stable >>
          USER: << pipeline.parameters.user >>
          LABEL: << pipeline.parameters.label >>
-       export LIBNETCDF_VER="libnetcdf=*=mpi_mpich_*"
-
       steps:
          - checkout
          - run: *setup_env
