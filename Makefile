@@ -58,12 +58,24 @@ conda-rerender: setup-build
 		-b $(branch) --do_rerender --conda_env $(conda_env) --ignore_conda_missmatch \
 		--conda_activate $(conda_activate)
 
+conda-local-rerender: setup-build 
+	python $(workdir)/$(build_script) -w $(workdir) -l $(last_stable) -B 0 -p $(pkg_name) -r $(repo_name) \
+		-b $(branch) --do_rerender --conda_env $(conda_env) --ignore_conda_missmatch \
+		--conda_activate $(conda_activate) --local_repo $(local_repo)
+
 conda-build:
 	mkdir -p $(artifact_dir)
 
 	python $(workdir)/$(build_script) -w $(workdir) -p $(pkg_name) --build_version $(build_version) \
 		--do_build --conda_env $(conda_env) --extra_channels $(extra_channels) \
 		--conda_activate $(conda_activate) $(conda_build_extra)
+
+conda-local-build:
+	mkdir -p $(artifact_dir)
+
+	python $(workdir)/$(build_script) -w $(workdir) -p $(pkg_name) --build_version $(build_version) \
+		--do_build --conda_env $(conda_env) --extra_channels $(extra_channels) \
+		--conda_activate $(conda_activate) $(conda_build_extra) --local_repo $(local_repo)
 
 conda-upload:
 	source $(conda_activate) $(conda_env); \
@@ -75,9 +87,7 @@ conda-dump-env:
 	source $(conda_activate) $(conda_env); conda list --explicit > $(artifact_dir)/$(conda_env_filename).txt
 
 run-tests:
-	source $(conda_activate) $(conda_env); python run_tests.py -H -v2 -n 1 `pwd`/tests/test_big_array.py
-	mv `pwd`/tests/test_big_array.py $(workdir)/
-	source $(conda_activate) $(conda_env); python run_tests.py -H -v2 --subdir
+	source $(conda_activate) $(conda_env); python -c "import vtk-cdat"
 
 run-coveralls:
 	source $(conda_activate) $(conda_env); coveralls;
