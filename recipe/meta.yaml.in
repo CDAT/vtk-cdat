@@ -72,8 +72,7 @@ requirements:
     - ffmpeg
     # needed by ffmpeg for nice videos
     - x264
-    - mesalib  17.3.9 # [osx and vtk_with_osmesa]
-    - mesalib  18.3.1 # [linux and vtk_with_osmesa]
+    - mesalib  # [vtk_with_osmesa]
 
   run:
     - python
@@ -97,8 +96,8 @@ requirements:
     - ffmpeg
     # needed by ffmpeg for nice videos
     - x264
-    - mesalib  17.3.9 # [osx and vtk_with_osmesa]
-    - mesalib  18.3.1 # [linux and vtk_with_osmesa]
+    - mesalib  # [vtk_with_osmesa]
+
 test:
     imports:
         - vtk
