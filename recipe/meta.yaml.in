@@ -48,26 +48,7 @@ requirements:
     - {{ cdt("libselinux") }} # [linux and not vtk_with_osmesa]    
 
   host:
-    - python
-    # VTK Third Party dependencies
-    - zlib
-    - freetype
-    - hdf5
-    - hdf5 * nompi_*
-    - libxml2
-    - libpng
-    - jpeg
-    - libtiff
-    - jsoncpp
-    - expat
-    - tbb
-    - tbb-devel
-    - libnetcdf
-    - libnetcdf * nompi_*
-    - lz4-c
-    - xorg-libxt  # [linux]
-    - boost-cpp
-    - tk
+    - python {{ python }}
     - numpy
     - ffmpeg
     # needed by ffmpeg for nice videos
@@ -75,24 +56,9 @@ requirements:
     - mesalib  # [vtk_with_osmesa]
 
   run:
-    - python
-    - future  # used in the generated python wrappers
-    # VTK Third Party dependencies
-    - zlib
-    - freetype
-    - hdf5
-    - libxml2
-    - libpng
-    - jpeg
-    - libtiff
-    - jsoncpp
-    - expat
-    - tbb
-    - libnetcdf
-    - lz4-c
-    - xorg-libxt  # [linux]
-    - tk
+    - python {{ python }}
     - {{ pin_compatible('numpy') }}
+    - future
     - ffmpeg
     # needed by ffmpeg for nice videos
     - x264
