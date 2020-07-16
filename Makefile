@@ -25,8 +25,7 @@ ifneq ($(coverage),)
 coverage = -c tests/coverage.json --coverage-from-egg
 endif
 
-#conda_recipes_branch ?= master
-conda_recipes_branch ?= add_hdf5_migrations
+conda_recipes_branch ?= master
 
 conda_base = $(patsubst %/bin/conda,%,$(conda))
 conda_activate = $(conda_base)/bin/activate
