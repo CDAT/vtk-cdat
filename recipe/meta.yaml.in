@@ -53,8 +53,6 @@ requirements:
     - ffmpeg
     # needed by ffmpeg for nice videos
     - x264
-    - hdf5
-    - hdf5 * nompi_*
     - libnetcdf
     - libnetcdf * nompi_*
     - mesalib  # [vtk_with_osmesa]
@@ -66,7 +64,6 @@ requirements:
     - ffmpeg
     # needed by ffmpeg for nice videos
     - x264
-    - hdf5
     - libnetcdf
     - mesalib  # [vtk_with_osmesa]
 
