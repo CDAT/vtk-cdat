@@ -15,7 +15,7 @@ parameters:
       default: "cdat"
    label:
       type: string
-      default: "nightly"
+      default: "cdat_dev"
 
 aliases:
   - &setup_env
