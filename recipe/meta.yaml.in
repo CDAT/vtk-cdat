@@ -1,6 +1,6 @@
 package:
   name: vtk-cdat
-  version: @VERSION@
+  version: 8.2.0.8.2.1
 
 source:
   # git_branch: master
@@ -9,7 +9,7 @@ source:
   git_url: https://gitlab.kitware.com/vtk/vtk.git
 
 build:
-  number: @BUILD_NUMBER@
+  number: 0
   skip: True  # [win] 
   features:
     - mesalib  # [vtk_with_osmesa]
@@ -85,3 +85,5 @@ extra:
         - doutriaux1
         - sankhesh
         - danlipsa
+	- jasonb5
+	- downiec
