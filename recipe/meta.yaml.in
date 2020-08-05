@@ -49,6 +49,24 @@ requirements:
 
   host:
     - python {{ python }}
+    - zlib
+    - freetype
+    - hdf5
+    - hdf5 * nompi_*
+    - libxml2
+    - libpng
+    - jpeg
+    - libtiff
+    - jsoncpp
+    - expat
+    - tbb
+    - tbb-devel
+    - libnetcdf
+    - libnetcdf * nompi_*
+    - lz4-c
+    - xorg-libxt  # [linux]
+    - boost-cpp
+    - tk
     - numpy
     - ffmpeg
     # needed by ffmpeg for nice videos
@@ -59,6 +77,21 @@ requirements:
 
   run:
     - python {{ python }}
+    - zlib
+    - freetype
+    - hdf5
+    - libxml2
+    - libpng
+    - jpeg
+    - libtiff
+    - jsoncpp
+    - expat
+    - tbb
+    - tbb-devel
+    - lz4-c
+    - xorg-libxt  # [linux]
+    - boost-cpp
+    - tk
     - {{ pin_compatible('numpy') }}
     - future
     - ffmpeg
